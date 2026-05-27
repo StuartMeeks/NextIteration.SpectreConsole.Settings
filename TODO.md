@@ -12,9 +12,6 @@ Outstanding ideas for future versions:
   from a `[Setting]` attribute, so consumers declare only the property.
 - **External change detection** — optionally watch the settings file and reload
   when another process rewrites it (last-writer-wins today).
-- **Backup-on-corrupt-load** — when a malformed file falls back to defaults,
-  side-car the unreadable file (e.g. `AppSettings.json.bak`) before the next write
-  overwrites it, instead of only surfacing the parse error to the handler.
 
 ## Commands
 
