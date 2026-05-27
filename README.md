@@ -246,7 +246,7 @@ Everything else is transitive.
 
 ## Contributing
 
-Issues and PRs welcome. The [TODO](TODO.md) tracks outstanding ideas.
+Issues and PRs welcome.
 
 When contributing code, please keep the zero-warning, fully-documented public surface. `TreatWarningsAsErrors` is on for a reason.
 
