@@ -134,8 +134,11 @@ AppSettings (Automatic)
 └──────────┴──────┘
 
 $ my-cli settings reset AppSettings
+Reset 'AppSettings' to defaults? This overwrites the saved file and cannot be undone. [y/N]: y
 Reset 'AppSettings' to defaults.
 ```
+
+`reset` prompts for confirmation (defaulting to "no") before overwriting. Pass `-f` / `--force` to skip the prompt in scripts or CI.
 
 ---
 

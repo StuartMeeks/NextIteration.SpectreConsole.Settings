@@ -15,9 +15,6 @@ Outstanding ideas for future versions:
 
 ## Commands
 
-- **Confirmation prompt on `reset`** — mirror the `--force` pattern from the Auth
-  package's `accounts delete`.
-
 > `settings get` / `set` was considered and dropped: the library favours flat
 > scalar settings (see the README "keeping it simple" note), and a single-property
 > CLI getter/setter added conversion/complex-type surface without enough payoff.

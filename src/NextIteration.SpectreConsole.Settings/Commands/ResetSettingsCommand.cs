@@ -30,6 +30,11 @@ namespace NextIteration.SpectreConsole.Settings.Commands
             [CommandOption("--all")]
             [Description("Reset all registered settings classes")]
             public bool All { get; set; }
+
+            /// <summary>Skip the confirmation prompt. Useful in scripts.</summary>
+            [CommandOption("-f|--force")]
+            [Description("Reset without confirmation")]
+            public bool Force { get; set; }
         }
 
         /// <inheritdoc />
@@ -48,6 +53,15 @@ namespace NextIteration.SpectreConsole.Settings.Commands
                     if (_store.Registrations.Count == 0)
                     {
                         AnsiConsole.MarkupLine("[yellow]No settings classes are registered.[/]");
+                        return 0;
+                    }
+
+                    if (!await ConfirmAsync(
+                        settings,
+                        $"Reset all {_store.Registrations.Count} settings class(es) to defaults? This overwrites their saved files and cannot be undone.",
+                        cancellationToken).ConfigureAwait(false))
+                    {
+                        AnsiConsole.MarkupLine("[yellow]Reset cancelled.[/]");
                         return 0;
                     }
 
@@ -73,6 +87,15 @@ namespace NextIteration.SpectreConsole.Settings.Commands
                     return 1;
                 }
 
+                if (!await ConfirmAsync(
+                    settings,
+                    $"Reset '{Markup.Escape(registration.Name)}' to defaults? This overwrites the saved file and cannot be undone.",
+                    cancellationToken).ConfigureAwait(false))
+                {
+                    AnsiConsole.MarkupLine("[yellow]Reset cancelled.[/]");
+                    return 0;
+                }
+
                 await _store.ResetAsync(registration.SettingsType, cancellationToken).ConfigureAwait(false);
                 AnsiConsole.MarkupLine($"[green]Reset '{Markup.Escape(registration.Name)}' to defaults.[/]");
                 return 0;
@@ -82,6 +105,19 @@ namespace NextIteration.SpectreConsole.Settings.Commands
                 CommandErrorReporter.Report(ex, "Error resetting settings", settings.Verbose);
                 return 1;
             }
+        }
+
+        // Returns true when the reset should proceed: either --force was passed
+        // or the user confirmed. The prompt defaults to "no" since a reset is
+        // destructive.
+        private static async Task<bool> ConfirmAsync(Settings settings, string message, CancellationToken cancellationToken)
+        {
+            if (settings.Force)
+            {
+                return true;
+            }
+
+            return await AnsiConsole.ConfirmAsync(message, defaultValue: false, cancellationToken).ConfigureAwait(false);
         }
 
         private void RenderAvailableClasses()
