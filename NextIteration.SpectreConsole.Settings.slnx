@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/NextIteration.SpectreConsole.Settings/NextIteration.SpectreConsole.Settings.csproj" />
+  <Project Path="tests/NextIteration.SpectreConsole.Settings.Tests/NextIteration.SpectreConsole.Settings.Tests.csproj" />
+</Solution>
