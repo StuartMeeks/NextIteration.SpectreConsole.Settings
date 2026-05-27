@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -15,6 +17,14 @@ namespace NextIteration.SpectreConsole.Settings.Commands
     public sealed class ListSettingsCommand(ISettingsStore store) : AsyncCommand<ListSettingsCommand.Settings>
     {
         private readonly ISettingsStore _store = store;
+
+        // Compact (single-line) JSON for rendering complex values in the table;
+        // enums as strings to match how they're written to disk.
+        private static readonly JsonSerializerOptions _displayJsonOptions = new(JsonSerializerDefaults.General)
+        {
+            WriteIndented = false,
+            Converters = { new JsonStringEnumConverter() },
+        };
 
         /// <summary>CLI settings for <c>settings list</c>.</summary>
         public sealed class Settings : SettingsCommandSettings
@@ -81,7 +91,7 @@ namespace NextIteration.SpectreConsole.Settings.Commands
             AnsiConsole.Write(table);
         }
 
-        private static string FormatValue(PropertyInfo property, object instance)
+        internal static string FormatValue(PropertyInfo property, object instance)
         {
             object? value;
             try
@@ -94,13 +104,46 @@ namespace NextIteration.SpectreConsole.Settings.Commands
                 return $"<error: {ex.InnerException?.Message ?? ex.Message}>";
             }
 
-            return value switch
+            if (value is null)
             {
-                null => string.Empty,
-                string s => s,
-                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
-                _ => value.ToString() ?? string.Empty,
-            };
+                return string.Empty;
+            }
+
+            var type = value.GetType();
+            if (IsScalar(type))
+            {
+                return value switch
+                {
+                    string s => s,
+                    IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                    _ => value.ToString() ?? string.Empty,
+                };
+            }
+
+            // Complex or collection value: render as compact JSON so the table
+            // stays informative instead of printing a bare type name.
+            try
+            {
+                return JsonSerializer.Serialize(value, type, _displayJsonOptions);
+            }
+            catch (NotSupportedException ex)
+            {
+                return $"<unserialisable: {ex.Message}>";
+            }
+        }
+
+        private static bool IsScalar(Type type)
+        {
+            var t = Nullable.GetUnderlyingType(type) ?? type;
+            return t.IsPrimitive
+                || t.IsEnum
+                || t == typeof(string)
+                || t == typeof(decimal)
+                || t == typeof(DateTime)
+                || t == typeof(DateTimeOffset)
+                || t == typeof(TimeSpan)
+                || t == typeof(Guid)
+                || t == typeof(Uri);
         }
     }
 }
