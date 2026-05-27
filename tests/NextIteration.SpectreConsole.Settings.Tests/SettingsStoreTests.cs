@@ -132,6 +132,35 @@ public sealed class SettingsStoreTests
     }
 
     [Fact]
+    public async Task CorruptFile_BacksUpAndFallsBackToDefaults()
+    {
+        using var temp = new TempDir();
+        var file = FileFor<SampleSettings>(temp.Path);
+        const string corrupt = "{ this is not valid json ";
+        await File.WriteAllTextAsync(file, corrupt);
+
+        Exception? surfaced = null;
+        await using var provider = new ServiceCollection()
+            .AddSettings<SampleSettings>(o =>
+            {
+                o.SettingsDirectory = temp.Path;
+                o.ErrorHandler = ex => surfaced = ex; // no-op stderr, capture instead
+            })
+            .BuildServiceProvider();
+
+        var settings = provider.GetRequiredService<SampleSettings>();
+
+        // Falls back to defaults rather than throwing on startup...
+        Assert.Equal("default-name", settings.Name);
+        // ...the parse error is surfaced...
+        Assert.IsType<System.Text.Json.JsonException>(surfaced);
+        // ...and the unreadable content is preserved as a sidecar.
+        var backup = file + ".bak";
+        Assert.True(File.Exists(backup));
+        Assert.Equal(corrupt, await File.ReadAllTextAsync(backup));
+    }
+
+    [Fact]
     public async Task ResetAsync_RestoresDefaults_InPlaceAndOnDisk()
     {
         using var temp = new TempDir();

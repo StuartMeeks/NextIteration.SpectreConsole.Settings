@@ -134,8 +134,11 @@ AppSettings (Automatic)
 └──────────┴──────┘
 
 $ my-cli settings reset AppSettings
+Reset 'AppSettings' to defaults? This overwrites the saved file and cannot be undone. [y/N]: y
 Reset 'AppSettings' to defaults.
 ```
+
+`reset` prompts for confirmation (defaulting to "no") before overwriting. Pass `-f` / `--force` to skip the prompt in scripts or CI.
 
 ---
 
@@ -171,6 +174,28 @@ Settings classes change over time. The default serializer is tolerant:
 - Property matching is case-insensitive; enums round-trip as readable strings; comments and trailing commas are tolerated on read.
 
 Supply your own `SettingsOptions.SerializerOptions` if you need different behaviour.
+
+---
+
+## Nested values & keeping it simple
+
+Persistence handles whatever `System.Text.Json` can serialise — nested objects, lists, and dictionaries all round-trip to and from the JSON file without extra work. Two things to know once you go beyond scalars:
+
+- **Automatic save only fires on the top-level setter.** `OnPropertyChanged()` runs when you assign a property *on the settings object* — not when you mutate *inside* a nested object or collection:
+
+  ```csharp
+  settings.Profile = new Profile { Name = "Ada" };   // ✅ persisted (the setter ran)
+  settings.Profile.Name = "Ada";                     // ❌ not detected in Automatic mode
+  settings.RecentFiles.Add("notes.txt");             // ❌ not detected
+  ```
+
+  To persist a nested change: reassign the whole property, model nested values as immutable `record`s and swap them (`settings.Profile = settings.Profile with { Name = "Ada" };`), or call `settings.Save()` / `await settings.SaveAsync()` after mutating.
+
+- **`settings list` renders complex values as compact JSON**, so the table stays readable instead of printing a type name.
+
+### Recommendation: prefer scalar properties
+
+Keep your life simple — make settings properties **scalars** (`string`, `bool`, numbers, `enum`, `DateTime`, `Guid`, `Uri`, …) wherever you can. A flat scalar settings class never hits the in-place-mutation gotcha above, reads cleanly in `settings list`, and is trivial to reason about. Reach for a nested object or collection only when you're happy to assign it wholesale.
 
 ---
 
@@ -221,7 +246,7 @@ Everything else is transitive.
 
 ## Contributing
 
-Issues and PRs welcome. The [TODO](TODO.md) tracks outstanding ideas.
+Issues and PRs welcome.
 
 When contributing code, please keep the zero-warning, fully-documented public surface. `TreatWarningsAsErrors` is on for a reason.
 

@@ -122,13 +122,30 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
             }
             catch (JsonException ex)
             {
-                // A malformed file shouldn't crash CLI startup. Surface it via
-                // the configured handler, then fall back to defaults. (Missing
-                // files are the common case and don't reach here.)
+                // A malformed file shouldn't crash CLI startup. Preserve the
+                // unreadable content as a sidecar before defaults take over —
+                // otherwise the next write silently overwrites it — then
+                // surface the error and fall back to defaults. (Missing files
+                // are the common case and don't reach here.)
+                TryBackupCorruptFile(descriptor.FilePath);
                 descriptor.ErrorHandler(ex);
             }
 
             return descriptor.Factory();
+        }
+
+        private static void TryBackupCorruptFile(string filePath)
+        {
+            try
+            {
+                File.Copy(filePath, filePath + ".bak", overwrite: true);
+            }
+            catch
+            {
+                // Best-effort: a failed backup must not prevent falling back to
+                // defaults. The original file is left untouched (the copy, not a
+                // move), so nothing is lost by a backup failure here.
+            }
         }
 
         private static void ResetInstanceToDefaults(SettingsBase instance, SettingsTypeDescriptor descriptor)

@@ -25,15 +25,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tolerant JSON persistence** — atomic writes (temp-file + rename), missing
   properties default, unknown properties ignored, case-insensitive matching,
   string-valued enums.
+- **Corrupt-file resilience** — a malformed settings file is copied to a
+  `{file}.bak` sidecar and the class falls back to defaults, rather than
+  crashing startup or letting the next write destroy the unreadable content.
 - **`settings` command branch** — `list` and `reset` (`<SettingsClassName>` and
   `--all`), drop-in via `CommandConfiguratorExtensions.AddSettingsBranch()`. All
-  commands honour `-v` / `--verbose`.
+  commands honour `-v` / `--verbose`. `reset` confirms before overwriting
+  (defaults to "no"; skip with `-f` / `--force`); `list` renders complex and
+  collection values as compact JSON.
 - **`ISettingsStore`** — enumerate registrations, resolve instances, and reset one
   or all classes at runtime.
 - Full XML documentation on the public surface.
-- Test suite (xUnit) with 22 tests covering load-on-missing-file, automatic
+- Test suite (xUnit) with 32 tests covering load-on-missing-file, automatic
   persistence + round-trip, explicit persistence, debounce coalescing, reset /
-  reset-all, tolerant deserialisation, atomic writes, and error surfacing.
+  reset-all, tolerant deserialisation, corrupt-file backup, atomic writes, error
+  surfacing, `settings list` value formatting, and end-to-end command flows
+  (including the `reset` confirmation prompt).
 - SourceLink, deterministic builds, published symbol packages (`snupkg`).
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
