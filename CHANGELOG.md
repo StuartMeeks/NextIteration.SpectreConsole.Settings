@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] — 2026-06-10
+
+### Changed
+
+- Updated NuGet dependencies to their latest stable versions: `Spectre.Console`
+  0.56.0, `Microsoft.Extensions.DependencyInjection(.Abstractions)` 10.0.9, and
+  `Microsoft.SourceLink.GitHub` 10.0.300 (plus the test-only `Microsoft.NET.Test.Sdk`,
+  `xunit`, `xunit.runner.visualstudio`, `coverlet.collector`, and
+  `Spectre.Console.Testing`). `Spectre.Console.Cli` remains 0.55.0 — its latest
+  stable, which only requires `Spectre.Console >= 0.55.0`.
+- Adopted Central Package Management: package versions now live in a single
+  `Directory.Packages.props`.
+- Publishing now uses NuGet Trusted Publishing (OIDC short-lived keys) instead of
+  a long-lived API-key secret.
+
 ## [0.1.0] — 2026-05-27
 
 ### Added — initial release
@@ -45,4 +60,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
+[0.1.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.1
 [0.1.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.0
