@@ -31,7 +31,7 @@ namespace NextIteration.SpectreConsole.Settings
     /// </remarks>
     public abstract class SettingsBase
     {
-        private readonly Lock _gate = new();
+        private readonly object _gate = new();
 
         private ISettingsPersister? _persister;
         private PersistenceMode _persistenceMode = PersistenceMode.Automatic;
