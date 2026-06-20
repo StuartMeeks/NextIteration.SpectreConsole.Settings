@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] — 2026-06-20
+
+### Added
+
+- Multi-targeting: the package now ships `net8.0` and `net10.0` assemblies (previously
+  `net10.0` only), broadening the range of consuming runtimes.
+
+### Changed
+
+- Switched the internal synchronization primitive from `System.Threading.Lock` (net9+)
+  to `object` so the same source compiles on `net8.0`.
+
 ## [0.1.1] — 2026-06-10
 
 ### Changed
@@ -60,5 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
+[0.2.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.2.0
 [0.1.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.1
 [0.1.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.0

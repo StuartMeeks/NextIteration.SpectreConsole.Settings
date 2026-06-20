@@ -13,7 +13,7 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
     /// </summary>
     internal sealed class SettingsStore : ISettingsStore
     {
-        private readonly Lock _gate = new();
+        private readonly object _gate = new();
         private readonly Dictionary<Type, SettingsTypeDescriptor> _descriptors;
         private readonly Dictionary<Type, Entry> _entries = new();
         private readonly List<SettingsRegistration> _registrations;
