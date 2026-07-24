@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] — 2026-07-24
+
+### Changed
+
+- Runtime-aligned Microsoft platform dependencies now carry per-target-framework
+  version floors instead of a single shared floor. In a library a
+  `PackageReference` version is a minimum NuGet forces on every consumer
+  (lowest-applicable-version resolution), so the previous single `10.0.x` floor on
+  `Microsoft.Extensions.DependencyInjection.Abstractions` forced `net8.0` consumers
+  off their own LTS servicing line. The `net8.0` assembly now floors it at `8.0.2`
+  and the `net10.0` assembly at `10.0.10`, each on its own runtime-aligned line.
+  `Spectre.Console` and `Spectre.Console.Cli` version independently of the
+  runtime and remain single common floors.
+- Updated NuGet dependencies to their latest stable versions: `Spectre.Console`
+  0.57.2 (and the test-only `Spectre.Console.Testing` 0.57.2) and
+  `Microsoft.SourceLink.GitHub` 10.0.301, plus the test-only
+  `Microsoft.Extensions.DependencyInjection` 10.0.10 and `Microsoft.NET.Test.Sdk`
+  18.8.1. `Spectre.Console.Cli` remains 0.55.0 — its latest stable, which only
+  requires `Spectre.Console >= 0.55.0`.
+
 ## [0.2.0] — 2026-06-20
 
 ### Added
@@ -72,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
+[0.3.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.3.0
 [0.2.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.2.0
 [0.1.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.1
 [0.1.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.0
