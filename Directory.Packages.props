@@ -4,20 +4,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Library -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+    <!-- Library — runtime-independent deps floored at a single common version.
+         Spectre.Console(.Cli) are pre-1.0 and version independently of the .NET
+         runtime, so a per-TFM floor would be meaningless (breaking changes land
+         between minors) — keep the version actually built/tested against. -->
     <PackageVersion Include="Spectre.Console" Version="0.56.0" />
     <!-- Spectre.Console.Cli's latest stable is 0.55.0 (no 0.56.0 exists); it only
          requires Spectre.Console >= 0.55.0, so the 0.56.0 above satisfies it. -->
     <PackageVersion Include="Spectre.Console.Cli" Version="0.55.0" />
+    <!-- Build-time only (PrivateAssets=All), never a consumer dependency. -->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
 
-    <!-- Tests -->
+    <!-- Tests (IsPackable=false) — single common floor, not shipped. -->
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
     <PackageVersion Include="Spectre.Console.Testing" Version="0.56.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+  </ItemGroup>
+
+  <!-- Runtime-aligned Microsoft platform deps: each target framework floors these
+       at its own major's latest stable servicing version. In a library a
+       PackageReference version is a minimum floor NuGet forces on every consumer
+       (lowest-applicable-version resolution); a single high floor would force
+       lower-TFM consumers (e.g. net8 LTS) off their runtime-aligned servicing
+       line. Per-TFM floors keep each consumer on its own line. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
   </ItemGroup>
 </Project>
