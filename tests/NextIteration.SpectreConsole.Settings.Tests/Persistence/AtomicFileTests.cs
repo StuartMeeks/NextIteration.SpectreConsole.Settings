@@ -13,9 +13,9 @@ public sealed class AtomicFileTests
         using var temp = new TempDir();
         var target = Path.Combine(temp.Path, "file.txt");
 
-        await AtomicFile.WriteAllTextAsync(target, "hello");
+        await AtomicFile.WriteAllTextAsync(target, "hello", TestContext.Current.CancellationToken);
 
-        Assert.Equal("hello", await File.ReadAllTextAsync(target));
+        Assert.Equal("hello", await File.ReadAllTextAsync(target, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -24,11 +24,10 @@ public sealed class AtomicFileTests
         using var temp = new TempDir();
         var target = Path.Combine(temp.Path, "file.txt");
 
-        await AtomicFile.WriteAllTextAsync(target, "hello");
+        await AtomicFile.WriteAllTextAsync(target, "hello", TestContext.Current.CancellationToken);
 
-        var files = Directory.GetFiles(temp.Path);
-        Assert.Single(files);
-        Assert.Equal(target, files[0]);
+        var file = Assert.Single(Directory.GetFiles(temp.Path));
+        Assert.Equal(target, file);
     }
 
     [Fact]
@@ -36,11 +35,11 @@ public sealed class AtomicFileTests
     {
         using var temp = new TempDir();
         var target = Path.Combine(temp.Path, "file.txt");
-        await File.WriteAllTextAsync(target, "original");
+        await File.WriteAllTextAsync(target, "original", TestContext.Current.CancellationToken);
 
-        await AtomicFile.WriteAllTextAsync(target, "replaced");
+        await AtomicFile.WriteAllTextAsync(target, "replaced", TestContext.Current.CancellationToken);
 
-        Assert.Equal("replaced", await File.ReadAllTextAsync(target));
+        Assert.Equal("replaced", await File.ReadAllTextAsync(target, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -50,10 +49,10 @@ public sealed class AtomicFileTests
         var target = Path.Combine(temp.Path, "file.txt");
 
         await Task.WhenAll(
-            AtomicFile.WriteAllTextAsync(target, "writer-a"),
-            AtomicFile.WriteAllTextAsync(target, "writer-b"));
+            AtomicFile.WriteAllTextAsync(target, "writer-a", TestContext.Current.CancellationToken),
+            AtomicFile.WriteAllTextAsync(target, "writer-b", TestContext.Current.CancellationToken));
 
-        var final = await File.ReadAllTextAsync(target);
+        var final = await File.ReadAllTextAsync(target, TestContext.Current.CancellationToken);
         Assert.True(final is "writer-a" or "writer-b", $"expected one writer to win, got: {final}");
 
         // Unique temp names mean no leftover ".tmp" files.

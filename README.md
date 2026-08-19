@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/NextIteration.SpectreConsole.Settings.svg)](https://www.nuget.org/packages/NextIteration.SpectreConsole.Settings/)
 [![Downloads](https://img.shields.io/nuget/dt/NextIteration.SpectreConsole.Settings.svg)](https://www.nuget.org/packages/NextIteration.SpectreConsole.Settings/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%2010.0-purple.svg)](https://dotnet.microsoft.com/)
 [![CI](https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/actions/workflows/ci.yml/badge.svg)](https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/actions/workflows/ci.yml)
 
 Strongly-typed, JSON-persisted settings and ready-made `settings` commands for CLI tools built on [Spectre.Console](https://spectreconsole.net/).
@@ -30,7 +30,7 @@ Stop hand-rolling the same `~/.app/config.json` + load/save boilerplate into eve
 dotnet add package NextIteration.SpectreConsole.Settings
 ```
 
-Targets `net10.0`.
+Targets `net8.0` and `net10.0`.
 
 ---
 
