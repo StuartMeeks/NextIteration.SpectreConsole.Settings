@@ -22,7 +22,8 @@ public sealed class CommandFlowTests
     private static Task SeedChangedAsync(string directory) =>
         File.WriteAllTextAsync(
             FileFor<SampleSettings>(directory),
-            "{\"Name\":\"changed\",\"Count\":99,\"Mode\":\"Second\"}");
+            "{\"Name\":\"changed\",\"Count\":99,\"Mode\":\"Second\"}",
+            TestContext.Current.CancellationToken);
 
     private static string LoadedName(string directory)
     {

@@ -8,9 +8,10 @@ public sealed class SettingsBaseTests
 {
     private static readonly TimeSpan _debounce = TimeSpan.FromMilliseconds(40);
 
-    // Comfortably longer than the debounce window so a scheduled write has
-    // definitely fired (or definitely not, in the explicit/no-op cases).
-    private static readonly TimeSpan _settle = TimeSpan.FromMilliseconds(400);
+    // Only used for negative assertions — "no write happened" and "no *second*
+    // write happened" have no effect to wait for, so they need an explicit quiet
+    // window. Positive assertions poll via Wait instead of sleeping.
+    private static readonly TimeSpan _quiet = TimeSpan.FromMilliseconds(400);
 
     [Fact]
     public void OnPropertyChanged_WhenUnbound_DoesNotThrow()
@@ -32,7 +33,10 @@ public sealed class SettingsBaseTests
         settings.Bind(persister, PersistenceMode.Automatic, static _ => { }, _debounce);
 
         settings.Name = "changed";
-        await Task.Delay(_settle);
+        await Wait.UntilAsync(
+            () => persister.WriteCount > 0,
+            "the debounced write to land",
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(1, persister.WriteCount);
     }
@@ -50,7 +54,14 @@ public sealed class SettingsBaseTests
         settings.Count = 2;
         settings.Mode = SampleMode.Second;
 
-        await Task.Delay(_settle);
+        await Wait.UntilAsync(
+            () => persister.WriteCount > 0,
+            "the coalesced write to land",
+            TestContext.Current.CancellationToken);
+
+        // Broken coalescing would schedule three independent writes; give the
+        // other two long enough to land before concluding only one happened.
+        await Task.Delay(_quiet, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, persister.WriteCount);
     }
@@ -63,7 +74,7 @@ public sealed class SettingsBaseTests
         settings.Bind(persister, PersistenceMode.Explicit, static _ => { }, _debounce);
 
         settings.Name = "changed";
-        await Task.Delay(_settle);
+        await Task.Delay(_quiet, TestContext.Current.CancellationToken);
 
         Assert.Equal(0, persister.WriteCount);
     }
@@ -76,7 +87,7 @@ public sealed class SettingsBaseTests
         settings.Bind(persister, PersistenceMode.Explicit, static _ => { }, _debounce);
 
         settings.Name = "changed";
-        await settings.SaveAsync();
+        await settings.SaveAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(1, persister.WriteCount);
     }
@@ -89,7 +100,10 @@ public sealed class SettingsBaseTests
         settings.Bind(persister, PersistenceMode.Explicit, static _ => { }, _debounce);
 
         settings.Save();
-        await Task.Delay(_settle);
+        await Wait.UntilAsync(
+            () => persister.WriteCount > 0,
+            "the fire-and-forget save to land",
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(1, persister.WriteCount);
     }
@@ -103,7 +117,10 @@ public sealed class SettingsBaseTests
         settings.Bind(persister, PersistenceMode.Automatic, ex => captured = ex, _debounce);
 
         settings.Name = "boom";
-        await Task.Delay(_settle);
+        await Wait.UntilAsync(
+            () => captured is not null,
+            "the failed write to reach the error handler",
+            TestContext.Current.CancellationToken);
 
         Assert.NotNull(captured);
         Assert.IsType<InvalidOperationException>(captured);
@@ -118,6 +135,6 @@ public sealed class SettingsBaseTests
 
         // SaveAsync is awaitable, so the error reaches the caller directly
         // rather than the fire-and-forget handler.
-        await Assert.ThrowsAsync<InvalidOperationException>(() => settings.SaveAsync());
+        await Assert.ThrowsAsync<InvalidOperationException>(() => settings.SaveAsync(TestContext.Current.CancellationToken));
     }
 }

@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+Test-infrastructure and repository maintenance. The library's public API and
+target frameworks are unchanged; the only consumer-visible change is a servicing
+bump to the `net10.0` `Microsoft.Extensions.DependencyInjection.Abstractions`
+floor.
+
+### Changed
+
+- Upgraded the test suite from xUnit.net v2 (`xunit` 2.9.3) to xUnit.net v3
+  (`xunit.v3` 4.0.0 — the v3 API line, at package version 4). v3 test projects
+  are self-hosting executables built on Microsoft.Testing.Platform rather than
+  libraries loaded by VSTest, so the test project is now
+  `<OutputType>Exe</OutputType>` and the VSTest-only
+  `Microsoft.NET.Test.Sdk` and `xunit.runner.visualstudio` packages are gone. A
+  root `global.json` opts `dotnet test` into the Microsoft.Testing.Platform
+  runner — the .NET 10 SDK refuses to drive an MTP test project through the
+  legacy VSTest path without it.
+- The test project now multi-targets `net8.0;net10.0`, mirroring the library.
+  Previously it targeted `net10.0` only, so its `ProjectReference` always
+  resolved to the library's `net10.0` build and the shipped `net8.0` assembly was
+  compile-checked and API-validated but never executed by a test. Both assemblies
+  now run the full suite. CI installs the .NET 8 runtime alongside .NET 10 to
+  match.
+- Reworked the timing-sensitive tests to wait for an observable effect instead of
+  sleeping for a fixed interval. Automatic persistence is debounced and
+  fire-and-forget, so nothing signals completion and the tests slept 400ms and
+  hoped; on a loaded machine the write could overrun that and
+  `Automatic_Mutation_PersistsAndRoundTrips` would fail spuriously (reproduced on
+  the pre-existing suite, so this predates the xUnit upgrade). Positive
+  assertions now poll via a new `Wait` test helper — returning as soon as the
+  effect lands, failing with a named expectation after 10s. Negative assertions
+  ("no write happened") keep an explicit quiet window, since there is nothing to
+  wait for and too short a wait can only mask a bug, never fail a correct build.
+- Replaced the coverage collector `coverlet.collector` (a VSTest data collector,
+  inert under Microsoft.Testing.Platform) with
+  `Microsoft.Testing.Extensions.CodeCoverage`. Collect coverage with
+  `dotnet test --coverage`.
+- Tests now thread `TestContext.Current.CancellationToken` through every
+  cancellable async call (xUnit analyzer rule xUnit1051), so a cancelled or
+  timed-out run stops promptly instead of waiting out its I/O and delays.
+- Updated NuGet dependencies to their latest stable versions: the test-only
+  `Microsoft.Extensions.DependencyInjection` 10.0.11 and the build-time-only
+  `Microsoft.SourceLink.GitHub` 10.0.400. The `net10.0`
+  `Microsoft.Extensions.DependencyInjection.Abstractions` floor moves to 10.0.11;
+  the `net8.0` floor stays at 8.0.2 (its LTS line's latest).
+  `Spectre.Console`/`Spectre.Console.Testing` 0.57.2 and `Spectre.Console.Cli`
+  0.55.0 are already current.
+- Bumped the CI workflow's actions to their current majors (`checkout` v7,
+  `setup-dotnet` v6, `upload-artifact` v7, `download-artifact` v8) and dropped
+  the now-redundant `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` override — those majors
+  already run on Node 24.
+
+### Fixed
+
+- README claimed the package targets `net10.0` only; it has shipped `net8.0` and
+  `net10.0` assemblies since 0.2.0.
+
 ## [0.3.0] — 2026-07-24
 
 ### Changed
@@ -92,6 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
+[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.3.0
 [0.2.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.2.0
 [0.1.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.1

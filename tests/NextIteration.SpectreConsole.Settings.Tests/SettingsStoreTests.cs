@@ -9,7 +9,9 @@ namespace NextIteration.SpectreConsole.Settings.Tests;
 public sealed class SettingsStoreTests
 {
     private static readonly TimeSpan _debounce = TimeSpan.FromMilliseconds(40);
-    private static readonly TimeSpan _settle = TimeSpan.FromMilliseconds(400);
+
+    // Negative assertions only — see the note on Wait. Positive ones poll.
+    private static readonly TimeSpan _quiet = TimeSpan.FromMilliseconds(400);
 
     private static ServiceProvider BuildProvider(string directory, PersistenceMode mode = PersistenceMode.Automatic) =>
         new ServiceCollection()
@@ -84,7 +86,14 @@ public sealed class SettingsStoreTests
             var settings = provider.GetRequiredService<SampleSettings>();
             settings.Name = "persisted";
             settings.Mode = SampleMode.Second;
-            await Task.Delay(_settle);
+
+            // The debounced write is fire-and-forget with nothing to await, and
+            // disposing the provider does not flush it — so wait for the value to
+            // actually reach disk before tearing this scope down and reloading.
+            await Wait.UntilFileContainsAsync(
+                FileFor<SampleSettings>(temp.Path),
+                "persisted",
+                TestContext.Current.CancellationToken);
         }
 
         // A fresh provider over the same directory must observe the writes.
@@ -105,10 +114,10 @@ public sealed class SettingsStoreTests
         var settings = provider.GetRequiredService<SampleSettings>();
 
         settings.Name = "changed";
-        await Task.Delay(_settle);
+        await Task.Delay(_quiet, TestContext.Current.CancellationToken);
         Assert.False(File.Exists(file));
 
-        await settings.SaveAsync();
+        await settings.SaveAsync(TestContext.Current.CancellationToken);
         Assert.True(File.Exists(file));
     }
 
@@ -121,7 +130,8 @@ public sealed class SettingsStoreTests
         // unknown property the schema has never heard of.
         await File.WriteAllTextAsync(
             FileFor<SampleSettings>(temp.Path),
-            """{ "name": "fromfile", "removedLegacyProperty": 42 }""");
+            """{ "name": "fromfile", "removedLegacyProperty": 42 }""",
+            TestContext.Current.CancellationToken);
 
         await using var provider = BuildProvider(temp.Path);
         var settings = provider.GetRequiredService<SampleSettings>();
@@ -137,7 +147,7 @@ public sealed class SettingsStoreTests
         using var temp = new TempDir();
         var file = FileFor<SampleSettings>(temp.Path);
         const string corrupt = "{ this is not valid json ";
-        await File.WriteAllTextAsync(file, corrupt);
+        await File.WriteAllTextAsync(file, corrupt, TestContext.Current.CancellationToken);
 
         Exception? surfaced = null;
         await using var provider = new ServiceCollection()
@@ -157,7 +167,7 @@ public sealed class SettingsStoreTests
         // ...and the unreadable content is preserved as a sidecar.
         var backup = file + ".bak";
         Assert.True(File.Exists(backup));
-        Assert.Equal(corrupt, await File.ReadAllTextAsync(backup));
+        Assert.Equal(corrupt, await File.ReadAllTextAsync(backup, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -171,9 +181,9 @@ public sealed class SettingsStoreTests
 
         settings.Name = "changed";
         settings.Count = 99;
-        await settings.SaveAsync();
+        await settings.SaveAsync(TestContext.Current.CancellationToken);
 
-        await store.ResetAsync(typeof(SampleSettings));
+        await store.ResetAsync(typeof(SampleSettings), TestContext.Current.CancellationToken);
 
         // The live instance the consumer holds is reset in place.
         Assert.Equal("default-name", settings.Name);
@@ -201,7 +211,7 @@ public sealed class SettingsStoreTests
         sample.Name = "changed";
         secondary.Enabled = false;
 
-        await provider.GetRequiredService<ISettingsStore>().ResetAllAsync();
+        await provider.GetRequiredService<ISettingsStore>().ResetAllAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal("default-name", sample.Name);
         Assert.True(secondary.Enabled);
@@ -214,6 +224,6 @@ public sealed class SettingsStoreTests
         await using var provider = BuildProvider(temp.Path);
         var store = provider.GetRequiredService<ISettingsStore>();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => store.ResetAsync(typeof(SecondarySettings)));
+        await Assert.ThrowsAsync<ArgumentException>(() => store.ResetAsync(typeof(SecondarySettings), TestContext.Current.CancellationToken));
     }
 }
