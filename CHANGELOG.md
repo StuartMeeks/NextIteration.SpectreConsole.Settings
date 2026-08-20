@@ -99,7 +99,9 @@ floor.
 ### Added
 
 - CodeQL code scanning (`security-and-quality` query pack), weekly plus on every
-  push and pull request.
+  push and pull request. Analysis excludes `**/obj/**` and `**/bin/**`, so generated
+  and compiled output — the xUnit auto-generated entry point among it — raises no
+  findings.
 - `SECURITY.md`, `CONTRIBUTING.md`, a pull request template, and a root `CLAUDE.md`.
   `SECURITY.md` states the scope this library does and does not claim — settings are
   stored as plain-text JSON and are explicitly not a place for secrets.
