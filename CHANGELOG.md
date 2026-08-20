@@ -59,9 +59,36 @@ floor.
   `setup-dotnet` v6, `upload-artifact` v7, `download-artifact` v8) and dropped
   the now-redundant `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` override — those majors
   already run on Node 24.
+- Adopted the canonical CI shape from
+  [NextIteration.Standards](https://github.com/StuartMeeks/NextIteration.Standards)
+  (`STANDARD.md` section 3). `build` and `test` are now separate jobs, `test`
+  runs a three-platform matrix (Linux, Windows, macOS) rather than Linux alone,
+  and an aggregating `ci` gate is the single required status check — so the
+  matrix can be reshaped without touching branch protection. Coverage is now
+  actually collected in CI (`dotnet test -- --coverage`); the collector was
+  referenced but never invoked. Workflows gained `concurrency`,
+  `timeout-minutes`, a least-privilege `permissions` block and a NuGet cache.
+
+### Added
+
+- CodeQL code scanning (`security-and-quality` query pack), weekly plus on every
+  push and pull request.
+- Dependabot for NuGet and GitHub Actions, with minor and patch updates grouped
+  and auto-merged behind CI, and majors left open for review. Major updates to
+  `Microsoft.Extensions.DependencyInjection.Abstractions` are suppressed, because
+  its floor is deliberately per-target-framework and an 8.x -> 10.x bump is never
+  mergeable here.
 
 ### Fixed
 
+- `AtomicFile` raised a sharing violation on Windows when two writers replaced
+  the same settings file concurrently, or when the destination was held open by
+  another handle. `File.Move(overwrite: true)` is `rename(2)` on POSIX, which
+  tolerates both, but `MoveFileEx` on Windows, which does not. Windows now uses
+  `File.Replace` (`ReplaceFile`) with a short retry. Present since 0.1.0 and
+  never caught, because the concurrent-writer test had only ever run on Linux;
+  identified while adding the Windows leg to the matrix and fixed in the same
+  change, so the branch stays green.
 - README claimed the package targets `net10.0` only; it has shipped `net8.0` and
   `net10.0` assemblies since 0.2.0.
 
