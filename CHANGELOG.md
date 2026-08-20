@@ -69,10 +69,21 @@ floor.
   referenced but never invoked. Workflows gained `concurrency`,
   `timeout-minutes`, a least-privilege `permissions` block and a NuGet cache.
 
+- `global.json` now pins the SDK (`10.0.100`, `rollForward: latestFeature`) as well
+  as the test runner. Without a pin a contributor on an older SDK gets different
+  analyzer results from CI, and `TreatWarningsAsErrors` turns that into a build that
+  fails for them and passes for everyone else.
+- Adopted the canonical `.gitignore` and `.editorconfig`. The `.editorconfig` change
+  scopes the private-field naming rule to instance fields — a `const` is a field, so
+  the rule previously demanded `_nonceSize` for `private const int NonceSize`.
+
 ### Added
 
 - CodeQL code scanning (`security-and-quality` query pack), weekly plus on every
   push and pull request.
+- `SECURITY.md`, `CONTRIBUTING.md`, a pull request template, and a root `CLAUDE.md`.
+  `SECURITY.md` states the scope this library does and does not claim — settings are
+  stored as plain-text JSON and are explicitly not a place for secrets.
 - Dependabot for NuGet and GitHub Actions, with minor and patch updates grouped
   and auto-merged behind CI, and majors left open for review. Major updates to
   `Microsoft.Extensions.DependencyInjection.Abstractions` are suppressed, because
