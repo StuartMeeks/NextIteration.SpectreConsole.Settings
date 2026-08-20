@@ -59,6 +59,13 @@ floor.
   `setup-dotnet` v6, `upload-artifact` v7, `download-artifact` v8) and dropped
   the now-redundant `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` override — those majors
   already run on Node 24.
+- Removed the `release` job that cut the GitHub release automatically from
+  `CHANGELOG.md`. `ci.yml`'s non-comment content is now identical to the canonical
+  template apart from the tag glob — the same as every other repo in the estate — and
+  `STANDARD.md` §3.0.1 now requires that and checks it. GitHub releases for this package
+  are cut by hand, as they already were everywhere else. **No consumer impact:** the job
+  only ever ran on a `v*` tag, after the package had already been pushed to nuget.org.
+  Publishing is unchanged.
 - Adopted the canonical CI shape from
   [NextIteration.Standards](https://github.com/StuartMeeks/NextIteration.Standards)
   (`STANDARD.md` section 3). `build` and `test` are now separate jobs, `test`

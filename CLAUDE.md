@@ -89,5 +89,12 @@ The single required status check is `ci` — an aggregating gate over `build` an
 Renaming those jobs is safe; the ruleset never names them. Do not make them required
 checks directly.
 
-`ci.yml` also carries a `release` job beyond the four `STANDARD.md` 3.1 names. It is
-tag-gated and downstream of `publish`, and cuts the GitHub release from `CHANGELOG.md`.
+**`ci.yml` is not yours to edit freely.** `STANDARD.md` §3.0.1 requires its non-comment
+content to match `templates/.github/workflows/ci.yml` in the standards repo exactly, apart
+from the tag glob and steps carrying an `EXCEPTIONS.md` entry. This repo has no such entry,
+so the only permitted difference is `tags: [ 'v*' ]` and the header comment. `audit-drift.sh`
+checks this. Change the template first, then every repo — never this file alone.
+
+GitHub releases here are cut by hand, as in every other repo in the estate. A fifth
+`release` job used to build them from `CHANGELOG.md`; it was removed as the estate's only
+divergence from the canonical workflow. Adding it back needs an `EXCEPTIONS.md` entry.

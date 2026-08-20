@@ -1,6 +1,8 @@
 # CI for NextIteration.SpectreConsole.Settings.
 # Canonical shape defined in NextIteration.Standards STANDARD.md section 3 — change it
-# there first, then here.
+# there first, then here. Section 3.0.1 requires this file's non-comment content to match
+# templates/.github/workflows/ci.yml exactly, apart from the tag glob below. It does.
+# This repo has no EXCEPTIONS.md entry, so there is nothing else here that differs.
 #
 # The single required status check is `ci`, the aggregating gate below. `build` and `test`
 # must NOT be required directly: `test` is a matrix, so its check names carry the matrix
@@ -9,11 +11,12 @@
 # The test matrix runs all three platforms (STANDARD.md 3.1.1). This library has no
 # OS-native backend, but it is a filesystem library: `AtomicFile` needs a different
 # replace primitive on Windows (`ReplaceFile`) than on POSIX (`rename(2)`), and path
-# handling, file locking and case sensitivity all differ. No EXCEPTIONS.md entry applies
-# to this repo.
+# handling, file locking and case sensitivity all differ.
 #
-# `release` is a fifth, tag-gated job beyond STANDARD.md 3.1's four. It cuts the GitHub
-# release from CHANGELOG.md after `publish`, and cannot run on a pull request.
+# GitHub releases for this repo are cut by hand, as in every other repo in the estate.
+# There used to be a fifth `release` job here that built them from CHANGELOG.md; it was
+# removed because it was the only thing in the estate diverging from this template, and
+# 3.1's four job names are a closed set. Do not add it back without an EXCEPTIONS.md entry.
 name: CI
 
 on:
@@ -165,39 +168,3 @@ jobs:
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
-
-  # Beyond STANDARD.md 3.1's canonical four, and downstream of `publish`, so a GitHub
-  # release is only ever cut for bytes that actually reached nuget.org. Tag-gated, so it
-  # can never run on a pull request.
-  release:
-    needs: publish
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    if: startsWith(github.ref, 'refs/tags/')
-
-    permissions:
-      contents: write   # creating the GitHub release
-
-    steps:
-      - uses: actions/checkout@v7
-
-      # Pull the section for this tag's version out of CHANGELOG.md
-      # (e.g. tag v0.1.0 -> the "## [0.1.0] — …" block) for the release body.
-      # Falls back to a minimal note if the section isn't found.
-      - name: Build release notes
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          awk -v ver="$version" '
-            $0 ~ "^## \\[" ver "\\]" { capture = 1; next }
-            capture && /^## \[/ { exit }
-            capture && /^\[.*\]: / { exit }
-            capture { print }
-          ' CHANGELOG.md > release-notes.md
-          if [ ! -s release-notes.md ]; then
-            echo "Release $GITHUB_REF_NAME" > release-notes.md
-          fi
-
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file release-notes.md --verify-tag
