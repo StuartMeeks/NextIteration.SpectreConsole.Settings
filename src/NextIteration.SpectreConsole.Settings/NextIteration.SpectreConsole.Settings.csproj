@@ -1,37 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+	<!--
+		Only what is specific to this project. Everything shared with the test
+		project lives in the root Directory.Build.props (STANDARD.md 1.2).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<AnalysisLevel>latest</AnalysisLevel>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<PackageId>NextIteration.SpectreConsole.Settings</PackageId>
 		<Version>0.3.0</Version>
-		<Authors>Stuart Meeks</Authors>
 		<Description>Strongly-typed, JSON-persisted settings for CLI tools, with automatic or explicit persistence and ready-made Spectre.Console settings commands.</Description>
 		<GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
 		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\packages</PackageOutputPath>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>spectre;cli;settings;configuration;json</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
-		<Copyright>© Stuart Meeks</Copyright>
-		<EnablePackageValidation>true</EnablePackageValidation>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<DebugType>portable</DebugType>
-		<ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<ItemGroup>

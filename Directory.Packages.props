@@ -1,6 +1,13 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!--
+      Hard-fail if a csproj declares <PackageReference Version="…" /> alongside
+      CPM. Without this MSBuild silently ignores the inline version and uses the
+      central one — which is the exact drift this file exists to prevent, and it
+      prevents it without ever saying so. See STANDARD.md 1.3.
+    -->
+    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
 
   <ItemGroup>
