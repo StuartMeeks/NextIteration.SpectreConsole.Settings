@@ -10,10 +10,11 @@
 		<!-- xUnit.net v3 test projects are self-hosting executables, not
 		     libraries loaded by an external runner. -->
 		<OutputType>Exe</OutputType>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<!-- Opts out of the Directory.Build.props default. Test and fixture code
+		     carries no XML docs, and TreatWarningsAsErrors would fail the build
+		     over every missing one. -->
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<!--
 			CA1707 (no underscores in member names) is the xUnit-naming

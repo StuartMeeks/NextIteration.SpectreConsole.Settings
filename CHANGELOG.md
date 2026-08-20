@@ -76,6 +76,18 @@ floor.
 - Adopted the canonical `.gitignore` and `.editorconfig`. The `.editorconfig` change
   scopes the private-field naming rule to instance fields — a `const` is a field, so
   the rule previously demanded `_nonceSize` for `private const int NonceSize`.
+- Moved the build properties shared by both projects out of the individual csprojs
+  and into the root `Directory.Build.props`. Both projects previously restated the
+  same fifteen properties, which is fifteen chances for one copy to drift silently.
+  Each csproj now carries only what is specific to it. `Directory.Packages.props`
+  also gains `CentralPackageVersionOverrideEnabled=false`, so a stray inline
+  `Version=` on a `PackageReference` is now an `NU1008` restore failure instead of
+  being silently ignored in favour of the central version. Verified to be a
+  no-op for consumers: packing at the same commit from a clean `obj/` before and
+  after produces a byte-identical `.nuspec`, byte-identical `net8.0` and `net10.0`
+  assemblies and XML docs, and identical `README.md`, icon and package metadata —
+  the only difference anywhere in the package is the `.psmdcp` filename, which NuGet
+  regenerates on every pack.
 
 ### Added
 

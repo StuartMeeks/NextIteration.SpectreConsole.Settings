@@ -1,8 +1,40 @@
 <Project>
-  <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Authors>Stuart Meeks</Authors>
-    <Company>Next Iteration</Company>
-  </PropertyGroup>
+
+	<!--
+		Properties identical across every project in this repo. STANDARD.md 1.2.
+
+		They used to be restated in each csproj. Fifteen copies of a property is
+		fifteen chances for one of them to drift, and the drift is silent — nothing
+		fails when a csproj quietly disagrees with its sibling about DebugType. A
+		csproj below carries only what is genuinely specific to it: PackageId,
+		Version, Description, PackageTags, TargetFrameworks, the package's own URLs,
+		and any real exception (the test project opting out of
+		GenerateDocumentationFile, because sample and fixture code has no XML docs
+		and TreatWarningsAsErrors would fail the build over it).
+
+		EnforceCodeStyleInBuild is deliberately NOT here. STANDARD.md 1.2.1 is
+		blocked: TreatWarningsAsErrors promotes every advisory .editorconfig
+		preference to a hard failure, which produced 490 build errors in a sibling
+		repo. It needs a per-rule gate-versus-advisory decision first.
+	-->
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>© Stuart Meeks</Copyright>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<Authors>Stuart Meeks</Authors>
+		<Company>Next Iteration</Company>
+	</PropertyGroup>
+
 </Project>
