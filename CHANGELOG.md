@@ -9,10 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Test-infrastructure and repository maintenance. The library's public API and
-target frameworks are unchanged; the only consumer-visible change is a servicing
-bump to the `net10.0` `Microsoft.Extensions.DependencyInjection.Abstractions`
-floor.
+_Nothing yet._
+
+## [1.0.0] — 2026-08-21
+
+First stable release. This is a milestone, not a rewrite: the public API and the
+shipped target frameworks (`net8.0` and `net10.0`) are unchanged from 0.3.0. What
+1.0.0 adds is a commitment — from here the public surface follows
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly, so a breaking
+change to it requires a 2.0.0. The work in this cycle is the test-infrastructure,
+repository maintenance and standards alignment below; the only consumer-visible
+runtime change is a servicing bump to the `net10.0`
+`Microsoft.Extensions.DependencyInjection.Abstractions` floor.
 
 ### Changed
 
@@ -83,6 +91,26 @@ floor.
 - Adopted the canonical `.gitignore` and `.editorconfig`. The `.editorconfig` change
   scopes the private-field naming rule to instance fields — a `const` is a field, so
   the rule previously demanded `_nonceSize` for `private const int NonceSize`.
+- Enabled `EnforceCodeStyleInBuild` and adopted the revised canonical
+  `.editorconfig` (`STANDARD.md` 1.2.1 and 5.2). The IDE style analyzers now run
+  in-build under `TreatWarningsAsErrors`, so the ordained house style — braces
+  always, block-scoped namespaces, `var` throughout, explicit accessibility,
+  collection expressions, the naming ruleset, and `CS1591` public-API docs — is
+  gated by the build rather than merely documented. The `.editorconfig` is now a
+  deliberate allow-list of named gates rather than a blanket severity, so a style
+  rule a future SDK ships never auto-fails the build. The clause had been blocked
+  on exactly that blanket-severity problem. Bringing the code to green under the
+  flag converted two collection initialisations in `SettingsStore` to collection
+  expressions and the test project's file-scoped namespaces to block-scoped — no
+  runtime behaviour changed, and all 64 tests (32 × `net8.0`/`net10.0`) still pass.
+  The test project also adds `IDE0005` to its `NoWarn` (`STANDARD.md` 2.7): that
+  rule only runs with `GenerateDocumentationFile` on, which the test project turns
+  off, so gating it would otherwise force the doc file back on.
+- Added a CodeQL `query-filters` block excluding `cs/unmanaged-code` and
+  `cs/call-to-unmanaged-code` (`STANDARD.md` 4.4). This library has no P/Invoke, so
+  the filter matches nothing here; it is carried to keep `codeql.yml` aligned with
+  the canonical template (`STANDARD.md` 3.0.1), which non-native repos share
+  harmlessly.
 - Moved the build properties shared by both projects out of the individual csprojs
   and into the root `Directory.Build.props`. Both projects previously restated the
   same fifteen properties, which is fifteen chances for one copy to drift silently.
@@ -209,7 +237,8 @@ floor.
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
-[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.3.0
 [0.2.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.2.0
 [0.1.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.1.1
