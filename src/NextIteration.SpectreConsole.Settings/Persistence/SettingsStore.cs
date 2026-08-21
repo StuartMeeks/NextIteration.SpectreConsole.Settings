@@ -15,7 +15,7 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
     {
         private readonly object _gate = new();
         private readonly Dictionary<Type, SettingsTypeDescriptor> _descriptors;
-        private readonly Dictionary<Type, Entry> _entries = new();
+        private readonly Dictionary<Type, Entry> _entries = [];
         private readonly List<SettingsRegistration> _registrations;
 
         public SettingsStore(IEnumerable<SettingsTypeDescriptor> descriptors)
@@ -24,15 +24,16 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
 
             var ordered = descriptors.ToList();
             _descriptors = ordered.ToDictionary(d => d.SettingsType);
-            _registrations = ordered
-                .Select(d => new SettingsRegistration
+            _registrations =
+            [
+                .. ordered.Select(d => new SettingsRegistration
                 {
                     Name = d.Name,
                     SettingsType = d.SettingsType,
                     FilePath = d.FilePath,
                     PersistenceMode = d.PersistenceMode,
-                })
-                .ToList();
+                }),
+            ];
         }
 
         public IReadOnlyList<SettingsRegistration> Registrations => _registrations;

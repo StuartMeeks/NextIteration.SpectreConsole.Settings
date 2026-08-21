@@ -12,16 +12,19 @@
 		GenerateDocumentationFile, because sample and fixture code has no XML docs
 		and TreatWarningsAsErrors would fail the build over it).
 
-		EnforceCodeStyleInBuild is deliberately NOT here. STANDARD.md 1.2.1 is
-		blocked: TreatWarningsAsErrors promotes every advisory .editorconfig
-		preference to a hard failure, which produced 490 build errors in a sibling
-		repo. It needs a per-rule gate-versus-advisory decision first.
+		EnforceCodeStyleInBuild is on (STANDARD.md 1.2.1). It runs the IDE
+		analyzers in-build, so the canonical .editorconfig (5.2) actually gates
+		the house style rather than merely documenting it. The clause was blocked
+		while the blanket severity turned every advisory preference into a hard
+		failure (490 in a sibling repo); that blanket is gone and the .editorconfig
+		is now a deliberate allow-list of named gates, so the flag is enforceable.
 	-->
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<AnalysisLevel>latest</AnalysisLevel>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<IncludeSymbols>true</IncludeSymbols>
