@@ -87,9 +87,9 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
             }
         }
 
+        // Unique per call so concurrent writers don't collide on a shared
+        // "{path}.tmp" name.
         private static string BuildTempPath(string finalPath) =>
-            // Unique per call so concurrent writers don't collide on a shared
-            // "{path}.tmp" name.
             $"{finalPath}.{Guid.NewGuid():N}.tmp";
 
         private static void TryDelete(string path)
