@@ -50,8 +50,12 @@ namespace NextIteration.SpectreConsole.Settings.Commands
 
                 return Task.FromResult(0);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OutOfMemoryException)
             {
+                // Top-level boundary: turn any operational failure into a clean
+                // message and a non-zero exit code rather than an unhandled
+                // stack trace. A process-fatal OutOfMemoryException is left to
+                // propagate.
                 CommandErrorReporter.Report(ex, "Error listing settings", settings.Verbose);
                 return Task.FromResult(1);
             }

@@ -9,7 +9,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Infrastructure
     internal sealed class TempDir : IDisposable
     {
         public string Path { get; } =
-            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ni.scs.tests." + Guid.NewGuid().ToString("N"));
+            System.IO.Path.Join(System.IO.Path.GetTempPath(), "ni.scs.tests." + Guid.NewGuid().ToString("N"));
 
         public TempDir()
         {
@@ -25,7 +25,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Infrastructure
                     Directory.Delete(Path, recursive: true);
                 }
             }
-            catch
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 // Best-effort cleanup. Stray scratch dirs in %TEMP% aren't a
                 // problem — the OS reclaims temp eventually.

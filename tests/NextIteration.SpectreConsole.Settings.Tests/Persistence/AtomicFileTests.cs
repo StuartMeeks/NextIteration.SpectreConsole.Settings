@@ -11,7 +11,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Persistence
         public async Task WriteAllTextAsync_WritesExpectedContent()
         {
             using var temp = new TempDir();
-            var target = Path.Combine(temp.Path, "file.txt");
+            var target = Path.Join(temp.Path, "file.txt");
 
             await AtomicFile.WriteAllTextAsync(target, "hello", TestContext.Current.CancellationToken);
 
@@ -22,7 +22,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Persistence
         public async Task WriteAllTextAsync_NoTempFileLeftBehindAfterSuccess()
         {
             using var temp = new TempDir();
-            var target = Path.Combine(temp.Path, "file.txt");
+            var target = Path.Join(temp.Path, "file.txt");
 
             await AtomicFile.WriteAllTextAsync(target, "hello", TestContext.Current.CancellationToken);
 
@@ -34,7 +34,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Persistence
         public async Task WriteAllTextAsync_OverwritesExisting()
         {
             using var temp = new TempDir();
-            var target = Path.Combine(temp.Path, "file.txt");
+            var target = Path.Join(temp.Path, "file.txt");
             await File.WriteAllTextAsync(target, "original", TestContext.Current.CancellationToken);
 
             await AtomicFile.WriteAllTextAsync(target, "replaced", TestContext.Current.CancellationToken);
@@ -46,7 +46,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Persistence
         public async Task WriteAllTextAsync_ConcurrentWriters_OneWinsNoStragglers()
         {
             using var temp = new TempDir();
-            var target = Path.Combine(temp.Path, "file.txt");
+            var target = Path.Join(temp.Path, "file.txt");
 
             await Task.WhenAll(
                 AtomicFile.WriteAllTextAsync(target, "writer-a", TestContext.Current.CancellationToken),

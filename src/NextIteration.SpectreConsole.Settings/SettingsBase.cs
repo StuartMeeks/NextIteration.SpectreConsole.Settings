@@ -198,39 +198,44 @@ namespace NextIteration.SpectreConsole.Settings
             TimeSpan interval,
             CancellationTokenSource cts)
         {
-            try
+            // This task owns the CTS for the rest of its life: the using
+            // disposes it on every exit path (cancelled or not). A superseding
+            // change or Save disposes its own reference too, but CTS.Dispose is
+            // idempotent, so the double-dispose is harmless.
+            using (cts)
             {
-                if (interval > TimeSpan.Zero)
+                try
                 {
-                    await Task.Delay(interval, cts.Token).ConfigureAwait(false);
-                }
-                else
-                {
-                    // Let the current synchronous call stack unwind so a burst
-                    // of setters all schedule-then-cancel and only the last
-                    // survives to write — coalescing with a zero interval too.
-                    await Task.Yield();
-                    cts.Token.ThrowIfCancellationRequested();
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                return; // superseded by a newer change or an explicit Save.
-            }
-            finally
-            {
-                lock (_gate)
-                {
-                    if (ReferenceEquals(_debounceCts, cts))
+                    if (interval > TimeSpan.Zero)
                     {
-                        _debounceCts = null;
+                        await Task.Delay(interval, cts.Token).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        // Let the current synchronous call stack unwind so a burst
+                        // of setters all schedule-then-cancel and only the last
+                        // survives to write — coalescing with a zero interval too.
+                        await Task.Yield();
+                        cts.Token.ThrowIfCancellationRequested();
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    return; // superseded by a newer change or an explicit Save.
+                }
+                finally
+                {
+                    lock (_gate)
+                    {
+                        if (ReferenceEquals(_debounceCts, cts))
+                        {
+                            _debounceCts = null;
+                        }
                     }
                 }
 
-                cts.Dispose();
+                await PersistGuardedAsync(persister).ConfigureAwait(false);
             }
-
-            await PersistGuardedAsync(persister).ConfigureAwait(false);
         }
 
         private async Task PersistGuardedAsync(ISettingsPersister persister)
@@ -239,10 +244,14 @@ namespace NextIteration.SpectreConsole.Settings
             {
                 await persister.PersistAsync(this).ConfigureAwait(false);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OutOfMemoryException)
             {
-                // Never swallow: route to the configured handler (default
-                // writes to stderr). This is the fire-and-forget safety net.
+                // Route any write failure to the configured handler (default
+                // writes to stderr): this is the fire-and-forget safety net, so
+                // the persister's exception (whatever type it is) must not be
+                // lost. A process-fatal OutOfMemoryException is the exception —
+                // reporting it as a settings-write failure would be misleading,
+                // so it propagates instead.
                 _errorHandler(ex);
             }
         }

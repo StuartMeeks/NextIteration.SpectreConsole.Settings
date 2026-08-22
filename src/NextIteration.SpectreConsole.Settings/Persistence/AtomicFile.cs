@@ -101,7 +101,7 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
                     File.Delete(path);
                 }
             }
-            catch
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 // Best-effort cleanup; a stray ".tmp" file is harmless — it
                 // doesn't match the "{ClassName}.json" name the loader reads.

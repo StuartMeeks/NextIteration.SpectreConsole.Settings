@@ -24,7 +24,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests
                 .BuildServiceProvider();
 
         private static string FileFor<T>(string directory) =>
-            Path.Combine(directory, typeof(T).Name + ".json");
+            Path.Join(directory, typeof(T).Name + ".json");
 
         [Fact]
         public void AddSettings_WithoutSettingsDirectory_Throws()
