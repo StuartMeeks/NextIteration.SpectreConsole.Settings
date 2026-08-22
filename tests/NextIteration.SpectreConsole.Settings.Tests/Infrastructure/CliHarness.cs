@@ -37,7 +37,8 @@ namespace NextIteration.SpectreConsole.Settings.Tests.Infrastructure
             var app = new CommandApp(new TypeRegistrar(services));
             app.Configure(config => config.AddSettingsBranch());
 
-            using var console = new TestConsole().Interactive();
+            using var console = new TestConsole();
+            console.Interactive();
             foreach (var line in consoleInput)
             {
                 console.Input.PushTextWithEnter(line);
