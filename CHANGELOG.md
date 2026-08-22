@@ -9,7 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Nothing yet._
+### Fixed
+
+- Resolved every open CodeQL code-scanning alert from the `security-and-quality`
+  pack with a genuine code change rather than a suppression (no consumer-visible
+  behaviour changes):
+  - `cs/path-combine`: switched every `Path.Combine` to `Path.Join` (one in
+    `ServiceCollectionExtensions`, the rest in test infrastructure). `Path.Join`
+    concatenates unconditionally, so it cannot silently discard the base
+    directory if a later segment ever looks rooted.
+  - `cs/catch-of-all-exceptions`: the two best-effort cleanup catches
+    (`AtomicFile.TryDelete`, `SettingsStore.TryBackupCorruptFile`) and the test
+    `TempDir.Dispose` now catch only the `IOException`/`UnauthorizedAccessException`
+    they expect, so an unexpected exception surfaces instead of being swallowed.
+    The three intentionally broad catches — the fire-and-forget persistence
+    safety net (`SettingsBase`) and the two `settings` command boundaries — keep
+    routing all operational failures to their handler but now let a process-fatal
+    `OutOfMemoryException` propagate rather than mislabel it.
+  - `cs/linq/missed-where`: `SettingsStore.ResetInstanceToDefaults` filters the
+    settable properties with `.Where(...)` instead of an `if` inside the loop.
+  - `cs/missed-using-statement`: the debounce task now scopes its
+    `CancellationTokenSource` with a `using` block instead of a manual
+    `finally`-dispose, preserving the existing (idempotent) disposal semantics.
+  - `cs/local-not-disposed`: the test CLI harness now disposes its `TestConsole`.
 
 ## [1.0.0] — 2026-08-21
 

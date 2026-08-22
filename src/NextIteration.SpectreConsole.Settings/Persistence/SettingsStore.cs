@@ -141,7 +141,7 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
             {
                 File.Copy(filePath, filePath + ".bak", overwrite: true);
             }
-            catch
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 // Best-effort: a failed backup must not prevent falling back to
                 // defaults. The original file is left untouched (the copy, not a
@@ -158,12 +158,13 @@ namespace NextIteration.SpectreConsole.Settings.Persistence
             instance.SuspendNotifications();
             try
             {
-                foreach (var property in descriptor.SettingsType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                var settableProperties = descriptor.SettingsType
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(property => property.CanRead && property.CanWrite && property.GetIndexParameters().Length == 0);
+
+                foreach (var property in settableProperties)
                 {
-                    if (property.CanRead && property.CanWrite && property.GetIndexParameters().Length == 0)
-                    {
-                        property.SetValue(instance, property.GetValue(defaults));
-                    }
+                    property.SetValue(instance, property.GetValue(defaults));
                 }
             }
             finally

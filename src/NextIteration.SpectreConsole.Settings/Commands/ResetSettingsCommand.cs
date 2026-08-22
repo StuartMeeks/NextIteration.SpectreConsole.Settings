@@ -100,8 +100,12 @@ namespace NextIteration.SpectreConsole.Settings.Commands
                 AnsiConsole.MarkupLine($"[green]Reset '{Markup.Escape(registration.Name)}' to defaults.[/]");
                 return 0;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OutOfMemoryException)
             {
+                // Top-level boundary: turn any operational failure into a clean
+                // message and a non-zero exit code rather than an unhandled
+                // stack trace. A process-fatal OutOfMemoryException is left to
+                // propagate.
                 CommandErrorReporter.Report(ex, "Error resetting settings", settings.Verbose);
                 return 1;
             }

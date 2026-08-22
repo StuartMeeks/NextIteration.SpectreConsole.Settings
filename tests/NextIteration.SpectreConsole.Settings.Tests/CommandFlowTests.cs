@@ -13,7 +13,7 @@ namespace NextIteration.SpectreConsole.Settings.Tests
     public sealed class CommandFlowTests
     {
         private static string FileFor<T>(string directory) =>
-            Path.Combine(directory, typeof(T).Name + ".json");
+            Path.Join(directory, typeof(T).Name + ".json");
 
         private static void Register(string directory, IServiceCollection services) =>
             services.AddSettings<SampleSettings>(o => o.SettingsDirectory = directory);

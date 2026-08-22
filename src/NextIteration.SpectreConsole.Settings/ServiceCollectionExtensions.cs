@@ -53,7 +53,7 @@ namespace NextIteration.SpectreConsole.Settings
             {
                 SettingsType = typeof(T),
                 Name = name,
-                FilePath = Path.Combine(options.SettingsDirectory, name + ".json"),
+                FilePath = Path.Join(options.SettingsDirectory, name + ".json"),
                 PersistenceMode = options.PersistenceMode,
                 DebounceInterval = options.DebounceInterval,
                 ErrorHandler = options.ErrorHandler ?? SettingsSerialization.DefaultErrorHandler,
