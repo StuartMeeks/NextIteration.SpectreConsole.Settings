@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [1.0.1] — 2026-08-22
+
+A patch release with **no consumer-visible API or runtime behaviour change**. The
+shipped assembly carries only behaviour-neutral internal refactors that cleared
+the CodeQL `security-and-quality` findings; the rest is CI-only (the move to
+buildless CodeQL analysis). Public surface and the shipped target frameworks
+(`net8.0`, `net10.0`) are unchanged from 1.0.0.
+
 ### Changed
 
 - Aligned `codeql.yml` with the updated canonical template (`STANDARD.md` 4.4,
@@ -280,7 +290,8 @@ runtime change is a servicing bump to the `net10.0`
 - `TreatWarningsAsErrors=true`, `AnalysisLevel=latest` — zero-warning public API.
 - Package icon, with the editable source vector kept under `design/icons/`.
 
-[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.3.0
 [0.2.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.2.0
