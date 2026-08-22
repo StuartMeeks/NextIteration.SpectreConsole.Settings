@@ -10,7 +10,7 @@
 
 	<PropertyGroup>
 		<PackageId>NextIteration.SpectreConsole.Settings</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Description>Strongly-typed, JSON-persisted settings for CLI tools, with automatic or explicit persistence and ready-made Spectre.Console settings commands.</Description>
 		<GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
 		<PackageOutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\packages</PackageOutputPath>
