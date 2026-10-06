@@ -16,9 +16,10 @@
          runtime, so a per-TFM floor would be meaningless (breaking changes land
          between minors) — keep the version actually built/tested against. -->
     <PackageVersion Include="Spectre.Console" Version="0.57.2" />
-    <!-- Spectre.Console.Cli's latest stable is 0.55.0 (no 0.56.0/0.57.0 exists); it
-         only requires Spectre.Console >= 0.55.0, so the 0.57.2 above satisfies it. -->
-    <PackageVersion Include="Spectre.Console.Cli" Version="0.55.0" />
+    <!-- Spectre.Console.Cli moved to its own release line and now matches
+         Spectre.Console at 0.57.2. 0.57 made AsyncCommand.ExecuteAsync public (it
+         was protected), so every override here is public. -->
+    <PackageVersion Include="Spectre.Console.Cli" Version="0.57.2" />
     <!-- Build-time only (PrivateAssets=All), never a consumer dependency. -->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
 
@@ -39,6 +40,6 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
   </ItemGroup>
 </Project>

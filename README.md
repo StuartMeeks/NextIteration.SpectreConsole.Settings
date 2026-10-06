@@ -236,9 +236,13 @@ A reset restores defaults **in place** on the live instance and persists immedia
 
 ## Requirements
 
-- **.NET 10.0** or later
-- **Spectre.Console** 0.54+ and **Spectre.Console.Cli** 0.53+
-- **Microsoft.Extensions.DependencyInjection.Abstractions** 10.0+
+- **.NET 8.0** or **.NET 10.0** (the package multi-targets `net8.0;net10.0`)
+- **Spectre.Console** 0.57.2+ and **Spectre.Console.Cli** 0.57.2+
+- **Microsoft.Extensions.DependencyInjection.Abstractions** — 8.0.2+ on `net8.0`,
+  10.0.12+ on `net10.0`
+
+Dependency floors are set per target framework, so a `net8.0` consumer is never dragged
+off its own 8.0.x servicing line.
 
 Everything else is transitive.
 

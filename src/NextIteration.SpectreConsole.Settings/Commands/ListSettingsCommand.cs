@@ -32,7 +32,7 @@ namespace NextIteration.SpectreConsole.Settings.Commands
         }
 
         /// <inheritdoc />
-        protected override Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
+        public override Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
             try
             {
