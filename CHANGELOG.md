@@ -11,6 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.1.0] — 2026-10-06
+
+Moves to **Spectre.Console.Cli 0.57.2**. Spectre.Console.Cli now ships on its own release
+line, and 0.57 changed `AsyncCommand<TSettings>.ExecuteAsync` from `protected` to `public`.
+`ListSettingsCommand` and `ResetSettingsCommand` follow suit. Widening an override is a
+compatible change for this package, but **raising the floor affects your own commands**:
+once you upgrade, every `AsyncCommand`/`Command` in your app built against 0.55 has to
+declare its `Execute`/`ExecuteAsync` override `public`, or the build fails with CS0507.
+
+### Changed
+
+- **Spectre.Console.Cli floor raised from 0.55.0 to 0.57.2**, matching Spectre.Console.
+- **`ExecuteAsync` on `ListSettingsCommand` and `ResetSettingsCommand` is now `public`**,
+  as Spectre.Console.Cli 0.57 requires.
+- **`net10.0` floor for `Microsoft.Extensions.DependencyInjection.Abstractions` raised from
+  10.0.11 to 10.0.12**, the current servicing release. The `net8.0` floor (8.0.2) is
+  unchanged.
+- **Dependabot now ignores the per-TFM-floored package outright** (STANDARD.md 4.10).
+  The previous `semver-major`-only ignore let a net10 minor/patch bump rewrite the net8
+  floor to a 10.x version. Both floors are now bumped by hand.
+- Build and test tooling: Microsoft.SourceLink.GitHub 10.0.401, xunit.v3 4.0.1,
+  Microsoft.Testing.Extensions.CodeCoverage 18.11.2, Microsoft.Extensions.DependencyInjection
+  10.0.12 (tests only). None ship to consumers.
+
+### Documentation
+
+- README: Requirements was stale. It claimed .NET 10 only, Spectre.Console 0.54+ and
+  Spectre.Console.Cli 0.53+. It now lists both target frameworks and the real floors.
+
 ## [1.0.1] — 2026-08-22
 
 A patch release with **no consumer-visible API or runtime behaviour change**. The
@@ -291,6 +320,8 @@ runtime change is a servicing bump to the `net10.0`
 - Package icon, with the editable source vector kept under `design/icons/`.
 
 [Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/StuartMeeks/NextIteration.SpectreConsole.Settings/releases/tag/v0.3.0
