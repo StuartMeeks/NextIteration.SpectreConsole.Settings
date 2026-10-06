@@ -95,6 +95,9 @@ from the tag glob and steps carrying an `EXCEPTIONS.md` entry. This repo has no 
 so the only permitted difference is `tags: [ 'v*' ]` and the header comment. `audit-drift.sh`
 checks this. Change the template first, then every repo — never this file alone.
 
-GitHub releases here are cut by hand, as in every other repo in the estate. A fifth
-`release` job used to build them from `CHANGELOG.md`; it was removed as the estate's only
-divergence from the canonical workflow. Adding it back needs an `EXCEPTIONS.md` entry.
+No GitHub Releases are cut here, or anywhere in the estate: `STANDARD.md` §3.10 makes
+nuget.org the only distribution channel. A release is a version bump plus a `v*` tag push,
+which triggers the tag-gated `publish` job. Tags stay; Release objects layered on them do
+not. A fifth `release` job used to build Releases from `CHANGELOG.md`. It was removed
+because it diverged from the canonical workflow, and §3.10 now forbids it outright, so no
+`EXCEPTIONS.md` entry can bring it back.
