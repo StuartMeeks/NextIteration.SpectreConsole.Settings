@@ -21,10 +21,10 @@
          was protected), so every override here is public. -->
     <PackageVersion Include="Spectre.Console.Cli" Version="0.57.2" />
     <!-- Build-time only (PrivateAssets=All), never a consumer dependency. -->
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.402" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.403" />
 
     <!-- Tests (IsPackable=false) — single common floor, not shipped. -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <PackageVersion Include="Spectre.Console.Testing" Version="0.57.2" />
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
